@@ -7,6 +7,7 @@ import { z } from 'zod'
 import { signIn } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import Image from 'next/image'
 
 const LoginSchema = z.object({
   email: z.string().email('Email inválido'),
@@ -57,13 +58,21 @@ export default function LoginPage() {
       <div className="w-full max-w-sm">
         {/* Logo */}
         <div className="text-center mb-8">
-          <Link
-            href="/"
-            className="inline-block text-2xl font-bold text-gray-900"
-          >
-            Moda<span className="text-blue-600">Guajira</span>
+          <Link href="/" className="inline-block">
+            <div className="flex flex-col items-center gap-2">
+              <Image
+                src="/logo.webp"
+                alt="Logo"
+                width={56}
+                height={56}
+                className="rounded-lg object-cover"
+                onError={(e) => {
+                  ;(e.target as HTMLImageElement).style.display = 'none'
+                }}
+              />
+            </div>
           </Link>
-          <p className="mt-2 text-sm text-gray-500">
+          <p className="mt-3 text-sm text-gray-600">
             Inicia sesión en tu cuenta
           </p>
         </div>
@@ -96,7 +105,7 @@ export default function LoginPage() {
                 autoComplete="email"
                 placeholder="tu@email.com"
                 {...register('email')}
-                className={`w-full h-11 px-4 rounded-lg border text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition ${
+                className={`w-full h-11 px-4 rounded-lg border text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent transition ${
                   errors.email
                     ? 'border-red-400 bg-red-50'
                     : 'border-gray-300 bg-gray-50'
@@ -120,7 +129,7 @@ export default function LoginPage() {
                 </label>
                 <Link
                   href="/recuperar-contrasena"
-                  className="text-xs text-blue-600 hover:underline"
+                  className="text-xs text-gray-600 hover:text-gray-900 hover:underline"
                 >
                   ¿Olvidaste la contraseña?
                 </Link>
@@ -131,7 +140,7 @@ export default function LoginPage() {
                 autoComplete="current-password"
                 placeholder="••••••••"
                 {...register('password')}
-                className={`w-full h-11 px-4 rounded-lg border text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition ${
+                className={`w-full h-11 px-4 rounded-lg border text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent transition ${
                   errors.password
                     ? 'border-red-400 bg-red-50'
                     : 'border-gray-300 bg-gray-50'
@@ -148,7 +157,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full h-11 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white text-sm font-semibold rounded-lg transition-colors flex items-center justify-center gap-2"
+              className="w-full h-11 bg-gray-900 hover:bg-gray-800 disabled:bg-gray-400 text-white text-sm font-semibold rounded-lg transition-colors flex items-center justify-center gap-2"
             >
               {isSubmitting ? (
                 <>
@@ -167,7 +176,7 @@ export default function LoginPage() {
           ¿No tienes cuenta?{' '}
           <Link
             href="/register"
-            className="text-blue-600 font-medium hover:underline"
+            className="text-gray-900 font-medium hover:underline hover:text-gray-700"
           >
             Regístrate gratis
           </Link>

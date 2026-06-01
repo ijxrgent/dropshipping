@@ -7,6 +7,7 @@ import { z } from 'zod'
 import { signIn } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import Image from 'next/image'
 import { ShoppingBag, Store } from 'lucide-react'
 
 const RegisterSchema = z
@@ -81,13 +82,21 @@ export default function RegisterPage() {
       <div className="w-full max-w-sm">
         {/* Logo */}
         <div className="text-center mb-8">
-          <Link
-            href="/"
-            className="inline-block text-2xl font-bold text-gray-900"
-          >
-            Moda<span className="text-blue-600">Guajira</span>
+          <Link href="/" className="inline-block">
+            <div className="flex flex-col items-center gap-2">
+              <Image
+                src="/logo.webp"
+                alt="Logo"
+                width={56}
+                height={56}
+                className="rounded-lg object-cover"
+                onError={(e) => {
+                  ;(e.target as HTMLImageElement).style.display = 'none'
+                }}
+              />
+            </div>
           </Link>
-          <p className="mt-2 text-sm text-gray-500">Crea tu cuenta gratis</p>
+          <p className="mt-3 text-sm text-gray-600">Crea tu cuenta gratis</p>
         </div>
 
         {/* Card */}
@@ -107,7 +116,7 @@ export default function RegisterPage() {
             {/* Selector de rol */}
             <div>
               <p className="text-sm font-medium text-gray-700 mb-2">
-                ¿Cómo quieres usar ModaGuajira?
+                ¿Cómo quieres usar nuestra plataforma?
               </p>
               <div className="grid grid-cols-2 gap-3">
                 <button
@@ -115,8 +124,8 @@ export default function RegisterPage() {
                   onClick={() => setValue('role', 'BUYER')}
                   className={`flex flex-col items-center gap-1.5 p-3 rounded-xl border-2 text-sm font-medium transition-colors ${
                     selectedRole === 'BUYER'
-                      ? 'border-blue-500 bg-blue-50 text-blue-700'
-                      : 'border-gray-200 text-gray-600 hover:border-gray-300'
+                      ? 'border-gray-900 bg-gray-900 text-white'
+                      : 'border-gray-200 text-gray-600 hover:border-gray-400'
                   }`}
                 >
                   <ShoppingBag size={20} />
@@ -127,8 +136,8 @@ export default function RegisterPage() {
                   onClick={() => setValue('role', 'SELLER')}
                   className={`flex flex-col items-center gap-1.5 p-3 rounded-xl border-2 text-sm font-medium transition-colors ${
                     selectedRole === 'SELLER'
-                      ? 'border-blue-500 bg-blue-50 text-blue-700'
-                      : 'border-gray-200 text-gray-600 hover:border-gray-300'
+                      ? 'border-gray-900 bg-gray-900 text-white'
+                      : 'border-gray-200 text-gray-600 hover:border-gray-400'
                   }`}
                 >
                   <Store size={20} />
@@ -151,7 +160,7 @@ export default function RegisterPage() {
                 autoComplete="name"
                 placeholder="María García"
                 {...register('name')}
-                className={`w-full h-11 px-4 rounded-lg border text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition ${
+                className={`w-full h-11 px-4 rounded-lg border text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent transition ${
                   errors.name
                     ? 'border-red-400 bg-red-50'
                     : 'border-gray-300 bg-gray-50'
@@ -178,7 +187,7 @@ export default function RegisterPage() {
                 autoComplete="email"
                 placeholder="tu@email.com"
                 {...register('email')}
-                className={`w-full h-11 px-4 rounded-lg border text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition ${
+                className={`w-full h-11 px-4 rounded-lg border text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent transition ${
                   errors.email
                     ? 'border-red-400 bg-red-50'
                     : 'border-gray-300 bg-gray-50'
@@ -205,7 +214,7 @@ export default function RegisterPage() {
                 autoComplete="new-password"
                 placeholder="Mínimo 6 caracteres"
                 {...register('password')}
-                className={`w-full h-11 px-4 rounded-lg border text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition ${
+                className={`w-full h-11 px-4 rounded-lg border text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent transition ${
                   errors.password
                     ? 'border-red-400 bg-red-50'
                     : 'border-gray-300 bg-gray-50'
@@ -232,7 +241,7 @@ export default function RegisterPage() {
                 autoComplete="new-password"
                 placeholder="Repite tu contraseña"
                 {...register('confirmPassword')}
-                className={`w-full h-11 px-4 rounded-lg border text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition ${
+                className={`w-full h-11 px-4 rounded-lg border text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent transition ${
                   errors.confirmPassword
                     ? 'border-red-400 bg-red-50'
                     : 'border-gray-300 bg-gray-50'
@@ -249,7 +258,7 @@ export default function RegisterPage() {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full h-11 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white text-sm font-semibold rounded-lg transition-colors flex items-center justify-center gap-2"
+              className="w-full h-11 bg-gray-900 hover:bg-gray-800 disabled:bg-gray-400 text-white text-sm font-semibold rounded-lg transition-colors flex items-center justify-center gap-2"
             >
               {isSubmitting ? (
                 <>
@@ -268,7 +277,7 @@ export default function RegisterPage() {
           ¿Ya tienes cuenta?{' '}
           <Link
             href="/login"
-            className="text-blue-600 font-medium hover:underline"
+            className="text-gray-900 font-medium hover:underline hover:text-gray-700"
           >
             Inicia sesión
           </Link>
