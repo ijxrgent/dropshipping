@@ -10,6 +10,8 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { ShoppingBag, Store } from 'lucide-react'
 
+import LogoRM from '@/assets/logo_rm.webp'
+
 const RegisterSchema = z
   .object({
     name: z.string().min(2, 'El nombre debe tener al menos 2 caracteres'),
@@ -85,7 +87,7 @@ export default function RegisterPage() {
           <Link href="/" className="inline-block">
             <div className="flex flex-col items-center gap-2">
               <Image
-                src="/logo.webp"
+                src={LogoRM}
                 alt="Logo"
                 width={56}
                 height={56}

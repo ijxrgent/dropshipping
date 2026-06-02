@@ -9,6 +9,8 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
 
+import LogoRM from '@/assets/logo_rm.webp'
+
 const LoginSchema = z.object({
   email: z.string().email('Email inválido'),
   password: z.string().min(1, 'Ingresa tu contraseña'),
@@ -61,7 +63,7 @@ export default function LoginPage() {
           <Link href="/" className="inline-block">
             <div className="flex flex-col items-center gap-2">
               <Image
-                src="/logo.webp"
+                src={LogoRM}
                 alt="Logo"
                 width={56}
                 height={56}
