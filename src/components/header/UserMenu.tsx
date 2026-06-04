@@ -11,7 +11,7 @@ import {
   LogOut,
   Settings,
 } from 'lucide-react'
-// import { signOut } from 'next-auth/react'  ← descomenta cuando tengas la sesión real
+import { signOut } from 'next-auth/react'
 
 interface UserMenuProps {
   user: { name: string; email: string; role: string }
@@ -125,7 +125,7 @@ export default function UserMenu({ user }: UserMenuProps) {
             <button
               onClick={() => {
                 setOpen(false)
-                // signOut({ callbackUrl: '/' })  ← descomenta cuando tengas la sesión real
+                signOut({ callbackUrl: '/' })
                 alert('signOut() — conectar con NextAuth')
               }}
               className="w-full flex items-center gap-3 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
