@@ -244,3 +244,16 @@ model PushToken {
   @@unique([userId, token])
   @@map("push_tokens")
 }
+
+model Banner {
+  id        String   @id @default(uuid())
+  imageUrl  String
+  title     String?
+  link      String?
+  order     Int      @default(0)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("banners")
+}
