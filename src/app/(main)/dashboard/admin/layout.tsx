@@ -19,10 +19,10 @@ import {
 
 const NAV_ITEMS = [
   { label: 'Métricas', href: '/dashboard/admin', icon: LayoutDashboard },
-  { label: 'Usuarios', href: '/dashboard/admin/usuarios', icon: Users },
-  { label: 'Tiendas', href: '/dashboard/admin/tiendas', icon: Store },
-  { label: 'Categorías', href: '/dashboard/admin/categorias', icon: Tag },
-  { label: 'Órdenes', href: '/dashboard/admin/ordenes', icon: ShoppingBag },
+  { label: 'Usuarios', href: '/dashboard/admin/users', icon: Users },
+  { label: 'Tiendas', href: '/dashboard/admin/shops', icon: Store },
+  { label: 'Categorías', href: '/dashboard/admin/categories', icon: Tag },
+  { label: 'Órdenes', href: '/dashboard/admin/orders', icon: ShoppingBag },
   { label: 'Banners', href: '/dashboard/admin/banners', icon: Image },
 ]
 

@@ -24,7 +24,7 @@ const ROLE_COLORS: Record<string, string> = {
   ADMIN: 'bg-blue-100 text-blue-700',
 }
 
-export default function UsuariosPage() {
+export default function UsersPage() {
   const [users, setUsers] = useState<User[]>([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
@@ -37,7 +37,7 @@ export default function UsuariosPage() {
     if (search) params.set('search', search)
     if (roleFilter !== 'ALL') params.set('role', roleFilter)
 
-    const res = await fetch(`/api/admin/usuarios?${params}`)
+    const res = await fetch(`/api/admin/users?${params}`)
     const data = await res.json()
     setUsers(data)
     setLoading(false)
@@ -50,7 +50,7 @@ export default function UsuariosPage() {
 
   async function toggleActive(user: User) {
     setUpdating(user.id)
-    await fetch(`/api/admin/usuarios/${user.id}`, {
+    await fetch(`/api/admin/users/${user.id}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ isActive: !user.isActive }),
@@ -61,7 +61,7 @@ export default function UsuariosPage() {
 
   async function changeRole(user: User, role: string) {
     setUpdating(user.id)
-    await fetch(`/api/admin/usuarios/${user.id}`, {
+    await fetch(`/api/admin/users/${user.id}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ role }),
