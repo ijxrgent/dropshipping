@@ -61,7 +61,7 @@ export default function AdminLayout({
         >
           {!collapsed && (
             <span className="font-bold text-gray-900 text-sm truncate">
-              Moda<span className="text-blue-600">Guajira</span>
+              Riohacha<span className="text-blue-600">Market</span>
               <span className="ml-1.5 text-[10px] font-medium bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded-full">
                 Admin
               </span>

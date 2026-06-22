@@ -9,7 +9,7 @@ import MobileMenu from './MobileMenu'
 export default function Header() {
   const [mobileOpen, setMobileOpen] = useState(false)
   const [cartCount] = useState(0)
-  const { data: session } = useSession()
+  const { data: session, status } = useSession()
 
   // Adapta la forma que espera HeaderTop y MobileMenu
   const sessionData = {
@@ -28,6 +28,7 @@ export default function Header() {
         session={sessionData}
         cartCount={cartCount}
         onMenuToggle={() => setMobileOpen((v) => !v)}
+        isLoading={status === 'loading'}
       />
       <HeaderNav />
       {mobileOpen && (

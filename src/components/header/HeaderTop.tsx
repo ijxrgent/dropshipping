@@ -1,4 +1,3 @@
-//src/components/header/HeaderTop.tsx
 'use client'
 
 import Image from 'next/image'
@@ -17,9 +16,14 @@ interface HeaderTopProps {
   session: Session
   cartCount: number
   onMenuToggle: () => void
+  isLoading: boolean
 }
 
-export default function HeaderTop({ session, onMenuToggle }: HeaderTopProps) {
+export default function HeaderTop({
+  session,
+  onMenuToggle,
+  isLoading,
+}: HeaderTopProps) {
   return (
     <div className="max-w-7xl mx-auto px-4 h-16 flex items-center gap-3">
       {/* Logo */}
@@ -73,19 +77,22 @@ export default function HeaderTop({ session, onMenuToggle }: HeaderTopProps) {
 
       {/* Acciones — escritorio */}
       <div className="hidden md:flex items-center gap-2 flex-shrink-0">
-        {session.user ? (
+        {isLoading ? (
+          // Skeleton mientras carga la sesión
+          <div className="w-24 h-9 bg-gray-100 rounded-lg animate-pulse" />
+        ) : session.user ? (
           <UserMenu user={session.user} />
         ) : (
           <>
             <Link
               href="/login"
-              className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
+              className="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
             >
               Iniciar sesión
             </Link>
             <Link
               href="/register"
-              className="px-4 py-2 text-sm font-medium text-white bg-gray-900 hover:bg-gray-800 rounded-lg transition-colors"
+              className="px-4 py-2 text-sm font-medium text-white bg-black hover:bg-black-700 rounded-lg transition-colors"
             >
               Registrarse
             </Link>
