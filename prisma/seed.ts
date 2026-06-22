@@ -1,12 +1,7 @@
 import 'dotenv/config'
-import ws from 'ws'
-import { neonConfig } from '@neondatabase/serverless'
 import { PrismaClient } from '@prisma/client'
 import { PrismaNeon } from '@prisma/adapter-neon'
 import bcrypt from 'bcryptjs'
-
-// Necesario en Node.js local — Neon usa WebSockets
-neonConfig.webSocketConstructor = ws
 
 const adapter = new PrismaNeon({
   connectionString: process.env.DATABASE_URL!,

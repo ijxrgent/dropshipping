@@ -1,9 +1,5 @@
-import ws from 'ws'
-import { neonConfig } from '@neondatabase/serverless'
 import { PrismaClient } from '@prisma/client'
 import { PrismaNeon } from '@prisma/adapter-neon'
-
-neonConfig.webSocketConstructor = ws // ← esto es lo que faltaba
 
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined
