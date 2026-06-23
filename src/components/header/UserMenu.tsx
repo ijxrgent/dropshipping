@@ -126,7 +126,6 @@ export default function UserMenu({ user }: UserMenuProps) {
               onClick={() => {
                 setOpen(false)
                 signOut({ callbackUrl: '/' })
-                alert('signOut() — conectar con NextAuth')
               }}
               className="w-full flex items-center gap-3 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
             >
