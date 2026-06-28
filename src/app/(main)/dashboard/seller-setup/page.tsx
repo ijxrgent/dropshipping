@@ -6,6 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { useRouter } from 'next/navigation'
 import { Store, Loader2 } from 'lucide-react'
+import LogoUploader from '@/components/upload/LogoUploader'
 
 const SetupSchema = z.object({
   name: z.string().min(3, 'El nombre debe tener al menos 3 caracteres').max(50),
@@ -26,6 +27,7 @@ function slugify(text: string) {
 export default function SellerSetupPage() {
   const router = useRouter()
   const [serverError, setServerError] = useState<string | null>(null)
+  const [logoUrl, setLogoUrl] = useState<string | null>(null)
 
   const {
     register,
@@ -49,6 +51,7 @@ export default function SellerSetupPage() {
         name: data.name,
         slug: slugPreview,
         description: data.description || null,
+        logoUrl, // ← puede ser null si el vendedor no subió logo, es opcional
       }),
     })
 
@@ -66,10 +69,10 @@ export default function SellerSetupPage() {
   return (
     <main className="min-h-screen bg-gray-50 flex items-center justify-center px-4 py-10">
       <div className="w-full max-w-md">
-        {/* Logo */}
+        {/* Logo de la plataforma */}
         <div className="text-center mb-8">
           <span className="inline-block text-2xl font-bold text-gray-900">
-            Riohacha <span className="text-blue-600">Market</span>
+            Moda<span className="text-blue-600">Guajira</span>
           </span>
         </div>
 
@@ -81,8 +84,7 @@ export default function SellerSetupPage() {
             </div>
             <h1 className="text-lg font-bold text-gray-900">Crea tu tienda</h1>
             <p className="text-sm text-gray-500 mt-1">
-              Este es el último paso antes de empezar a vender en Riohacha
-              Market
+              Este es el último paso antes de empezar a vender en ModaGuajira
             </p>
           </div>
 
@@ -97,6 +99,15 @@ export default function SellerSetupPage() {
               </div>
             )}
 
+            {/* Logo de la tienda */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Logo de tu tienda{' '}
+                <span className="text-gray-400 font-normal">(opcional)</span>
+              </label>
+              <LogoUploader onUploaded={setLogoUrl} />
+            </div>
+
             {/* Nombre de la tienda */}
             <div>
               <label
@@ -109,7 +120,6 @@ export default function SellerSetupPage() {
                 id="name"
                 type="text"
                 placeholder="Ej: Mochilas Wayuu María"
-                autoFocus
                 {...register('name')}
                 className={`w-full h-11 px-4 rounded-lg border text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition ${
                   errors.name

@@ -1,6 +1,8 @@
+//src/app/(main)/dashboard/seller/page.tsx
 import { auth } from '@/auth'
 import { prisma } from '@/lib/prisma'
-import { Store, Package, ShoppingBag, TrendingUp } from 'lucide-react'
+import StoreLogo from '@/components/upload/StoreLogo'
+import { Package, ShoppingBag, TrendingUp } from 'lucide-react'
 
 export default async function SellerDashboardPage() {
   const session = await auth()
@@ -28,9 +30,7 @@ export default async function SellerDashboardPage() {
     <div>
       {/* Cabecera de la tienda */}
       <div className="flex items-center gap-4 mb-6">
-        <div className="w-14 h-14 rounded-xl bg-teal-50 flex items-center justify-center flex-shrink-0">
-          <Store size={24} className="text-teal-600" />
-        </div>
+        <StoreLogo logoUrl={store.logoUrl} storeName={store.name} size={56} />
         <div>
           <h1 className="text-xl font-bold text-gray-900">{store.name}</h1>
           <p className="text-sm text-gray-500">

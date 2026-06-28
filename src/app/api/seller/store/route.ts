@@ -11,7 +11,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'No autorizado' }, { status: 403 })
   }
 
-  // Verificar que el vendedor no tenga ya una tienda
   const existing = await prisma.store.findUnique({
     where: { userId: session.user.id },
   })
@@ -23,7 +22,7 @@ export async function POST(req: NextRequest) {
     )
   }
 
-  const { name, slug, description } = await req.json()
+  const { name, slug, description, logoUrl } = await req.json()
 
   if (!name || !slug) {
     return NextResponse.json(
@@ -32,7 +31,6 @@ export async function POST(req: NextRequest) {
     )
   }
 
-  // Verificar que el slug no esté en uso, y agregar sufijo si es necesario
   let finalSlug = slug
   let counter = 1
   while (await prisma.store.findUnique({ where: { slug: finalSlug } })) {
@@ -46,7 +44,8 @@ export async function POST(req: NextRequest) {
       name,
       slug: finalSlug,
       description,
-      isActive: true, // se activa al crearse; la suscripción se valida en otra fase
+      logoUrl: logoUrl ?? null,
+      isActive: true,
     },
   })
 
