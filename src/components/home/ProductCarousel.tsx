@@ -49,7 +49,7 @@ export default function ProductCarousel({ products }: ProductCarouselProps) {
           return (
             <Link
               key={product.id}
-              href={`/tienda/${product.store.slug}/${product.slug}`}
+              href={`/shop/${product.store.slug}/${product.slug}`}
               className="flex-shrink-0 w-44 sm:w-52 bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-md hover:border-[#D98A4F]/40 transition-all"
             >
               <div className="relative h-44 sm:h-48 bg-gray-100">

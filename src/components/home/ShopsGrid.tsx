@@ -28,7 +28,7 @@ export default function ShopsGrid({ shops }: ShopsGridProps) {
       {shops.map((shop) => (
         <Link
           key={shop.id}
-          href={`/tienda/${shop.slug}`}
+          href={`/shop/${shop.slug}`}
           className="flex flex-col items-center gap-3 bg-white border border-gray-200 rounded-xl py-6 px-3 hover:shadow-md hover:border-[#1B6E73]/40 transition-all text-center"
         >
           <div className="relative w-16 h-16 rounded-full bg-gray-100 overflow-hidden flex-shrink-0">
