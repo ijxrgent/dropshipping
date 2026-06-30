@@ -12,6 +12,7 @@ import {
   Package,
 } from 'lucide-react'
 import { withCloudinaryTransform } from '@/lib/cloudinaryUrl'
+import { useCartCount } from '@/components/header/CartCountProvider'
 
 interface CartItemData {
   id: string
@@ -29,6 +30,7 @@ interface CartItemData {
 
 export default function CartView() {
   const router = useRouter()
+  const { refreshCount } = useCartCount()
   const [items, setItems] = useState<CartItemData[]>([])
   const [loading, setLoading] = useState(true)
   const [updatingId, setUpdatingId] = useState<string | null>(null)
@@ -66,6 +68,7 @@ export default function CartView() {
         item.id === itemId ? { ...item, quantity: newQuantity } : item
       )
     )
+    refreshCount()
     setUpdatingId(null)
   }
 
@@ -73,6 +76,7 @@ export default function CartView() {
     setUpdatingId(itemId)
     await fetch(`/api/cart/${itemId}`, { method: 'DELETE' })
     setItems((prev) => prev.filter((item) => item.id !== itemId))
+    refreshCount()
     setUpdatingId(null)
   }
 

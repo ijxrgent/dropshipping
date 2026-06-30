@@ -7,6 +7,7 @@ import LogoRM from '@/assets/logo_rm.webp'
 
 import { ShoppingCart, Menu, Search } from 'lucide-react'
 import UserMenu from './UserMenu'
+import { useCartCount } from './CartCountProvider'
 
 interface Session {
   user: { name: string; email: string; role: string } | null
@@ -14,7 +15,6 @@ interface Session {
 
 interface HeaderTopProps {
   session: Session
-  cartCount: number
   onMenuToggle: () => void
   isLoading: boolean
 }
@@ -24,6 +24,8 @@ export default function HeaderTop({
   onMenuToggle,
   isLoading,
 }: HeaderTopProps) {
+  const { count: cartCount } = useCartCount()
+
   return (
     <div className="max-w-7xl mx-auto px-4 h-16 flex items-center gap-3">
       {/* Logo */}
@@ -65,6 +67,11 @@ export default function HeaderTop({
           className="relative p-2 rounded-lg hover:bg-gray-100 transition-colors"
         >
           <ShoppingCart size={22} className="text-gray-900" />
+          {cartCount > 0 && (
+            <span className="absolute top-1 right-1 bg-red-500 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center leading-none">
+              {cartCount > 9 ? '9+' : cartCount}
+            </span>
+          )}
         </Link>
         <button
           onClick={onMenuToggle}
@@ -106,6 +113,11 @@ export default function HeaderTop({
           className="relative p-2 rounded-lg hover:bg-gray-100 transition-colors ml-1"
         >
           <ShoppingCart size={22} className="text-gray-900" />
+          {cartCount > 0 && (
+            <span className="absolute top-1 right-1 bg-red-500 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center leading-none">
+              {cartCount > 9 ? '9+' : cartCount}
+            </span>
+          )}
         </Link>
       </div>
     </div>

@@ -8,7 +8,6 @@ import MobileMenu from './MobileMenu'
 
 export default function Header() {
   const [mobileOpen, setMobileOpen] = useState(false)
-  const [cartCount] = useState(0)
   const { data: session, status } = useSession()
 
   // Adapta la forma que espera HeaderTop y MobileMenu
@@ -26,7 +25,6 @@ export default function Header() {
     <header className="w-full bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm">
       <HeaderTop
         session={sessionData}
-        cartCount={cartCount}
         onMenuToggle={() => setMobileOpen((v) => !v)}
         isLoading={status === 'loading'}
       />

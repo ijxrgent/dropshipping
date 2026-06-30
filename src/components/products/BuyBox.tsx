@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Minus, Plus, ShoppingCart, Zap, Loader2 } from 'lucide-react'
+import { useCartCount } from '@/components/header/CartCountProvider'
 
 interface BuyBoxProps {
   productId: string
@@ -18,6 +19,7 @@ export default function BuyBox({
   isLoggedIn,
 }: BuyBoxProps) {
   const router = useRouter()
+  const { refreshCount } = useCartCount()
   const [quantity, setQuantity] = useState(1)
   const [loadingAction, setLoadingAction] = useState<'cart' | 'buy' | null>(
     null
@@ -52,6 +54,7 @@ export default function BuyBox({
 
     if (res.ok) {
       setFeedback('Agregado al carrito')
+      refreshCount()
       router.refresh()
     } else {
       const data = await res.json()
@@ -77,6 +80,7 @@ export default function BuyBox({
     setLoadingAction(null)
 
     if (res.ok) {
+      refreshCount()
       router.push('/checkout')
     } else {
       const data = await res.json()
