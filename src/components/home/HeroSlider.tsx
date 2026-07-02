@@ -3,15 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 
-interface Slide {
-  title: string
-  subtitle: string
-  gradient: string
-}
-
-// Por ahora son slides de bienvenida con datos estáticos.
-// Cuando el admin construya el panel de Banners, esto se alimenta de la BD.
-const SLIDES: Slide[] = [
+const SLIDES = [
   {
     title: 'Moda con raíces',
     subtitle: 'Artesanías wayuu y diseño local, directo desde La Guajira',
@@ -32,7 +24,6 @@ const SLIDES: Slide[] = [
 
 export default function HeroSlider() {
   const [index, setIndex] = useState(0)
-
   const next = useCallback(() => setIndex((i) => (i + 1) % SLIDES.length), [])
   const prev = useCallback(
     () => setIndex((i) => (i - 1 + SLIDES.length) % SLIDES.length),
@@ -40,59 +31,79 @@ export default function HeroSlider() {
   )
 
   useEffect(() => {
-    const timer = setInterval(next, 5500)
-    return () => clearInterval(timer)
+    const t = setInterval(next, 5000)
+    return () => clearInterval(t)
   }, [next])
 
   return (
-    <section className="relative w-full h-56 sm:h-72 lg:h-80 rounded-2xl overflow-hidden">
+    // Sin margen lateral — ocupa todo el ancho del contenedor padre
+    <div
+      className="relative w-full overflow-hidden"
+      style={{ height: '200px' }}
+    >
       {SLIDES.map((slide, i) => (
         <div
-          key={slide.title}
-          className={`absolute inset-0 bg-gradient-to-br ${slide.gradient} transition-opacity duration-700 ${
-            i === index ? 'opacity-100' : 'opacity-0'
-          }`}
+          key={i}
+          className={`absolute inset-0 bg-gradient-to-br ${slide.gradient} transition-opacity duration-700 ${i === index ? 'opacity-100' : 'opacity-0'}`}
         >
-          <div className="h-full flex flex-col items-start justify-center px-6 sm:px-12 max-w-xl">
-            <h2 className="text-white text-2xl sm:text-3xl lg:text-4xl font-bold leading-tight">
+          {/* Texto: margen izquierdo de 52px para no chocar con la flecha (36px botón + espacio) */}
+          <div
+            className="absolute inset-0 flex flex-col justify-center"
+            style={{
+              paddingLeft: '52px',
+              paddingRight: '52px',
+              maxWidth: '560px',
+            }}
+          >
+            <h2
+              className="text-white font-bold leading-tight"
+              style={{ fontSize: '18px' }}
+            >
               {slide.title}
             </h2>
-            <p className="text-white/90 text-sm sm:text-base mt-2">
+            <p
+              className="text-white mt-1.5"
+              style={{ fontSize: '13px', opacity: 0.9 }}
+            >
               {slide.subtitle}
             </p>
           </div>
         </div>
       ))}
 
-      {/* Controles */}
+      {/* Flechas pegadas a los bordes */}
       <button
         onClick={prev}
-        aria-label="Slide anterior"
-        className="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-white/20 hover:bg-white/30 backdrop-blur-sm flex items-center justify-center transition-colors"
+        aria-label="Anterior"
+        className="absolute left-2 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full flex items-center justify-center z-10"
+        style={{ background: 'rgba(255,255,255,0.22)' }}
       >
-        <ChevronLeft size={18} className="text-white" />
+        <ChevronLeft size={18} color="white" />
       </button>
       <button
         onClick={next}
-        aria-label="Siguiente slide"
-        className="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-white/20 hover:bg-white/30 backdrop-blur-sm flex items-center justify-center transition-colors"
+        aria-label="Siguiente"
+        className="absolute right-2 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full flex items-center justify-center z-10"
+        style={{ background: 'rgba(255,255,255,0.22)' }}
       >
-        <ChevronRight size={18} className="text-white" />
+        <ChevronRight size={18} color="white" />
       </button>
 
       {/* Indicadores */}
-      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-1.5">
-        {SLIDES.map((slide, i) => (
+      <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5">
+        {SLIDES.map((_, i) => (
           <button
-            key={slide.title}
+            key={i}
             onClick={() => setIndex(i)}
-            aria-label={`Ir al slide ${i + 1}`}
-            className={`h-1.5 rounded-full transition-all ${
-              i === index ? 'w-6 bg-white' : 'w-1.5 bg-white/50'
-            }`}
+            aria-label={`Slide ${i + 1}`}
+            className="h-1.5 rounded-full transition-all"
+            style={{
+              width: i === index ? '22px' : '6px',
+              background: i === index ? 'white' : 'rgba(255,255,255,0.5)',
+            }}
           />
         ))}
       </div>
-    </section>
+    </div>
   )
 }

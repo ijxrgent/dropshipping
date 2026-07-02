@@ -27,31 +27,34 @@ export default async function HomePage() {
   ])
 
   return (
-    <main className="max-w-7xl mx-auto px-4 py-6 sm:py-8 space-y-10">
-      {/* Hero / slider */}
+    <main className="w-full">
+      {/* Hero: sin padding lateral, ocupa todo el ancho */}
       <HeroSlider />
 
-      {/* Productos destacados */}
-      <section>
-        <div className="flex items-baseline justify-between mb-4">
-          <h2 className="text-lg font-bold text-gray-900">Recién publicados</h2>
-          <p className="text-xs text-gray-400">Lo más nuevo del marketplace</p>
-        </div>
-        <ProductCarousel products={products} />
-      </section>
-
-      {/* Tiendas destacadas */}
-      <section>
-        <div className="flex items-baseline justify-between mb-4">
-          <h2 className="text-lg font-bold text-gray-900">
-            Tiendas en ModaGuajira
-          </h2>
-          <p className="text-xs text-gray-400">
-            Vendedores activos en la plataforma
+      {/* Resto del contenido: con padding lateral */}
+      <div className="max-w-7xl mx-auto px-4 pb-24 sm:pb-8">
+        {/* Productos */}
+        <section className="mt-6">
+          <p
+            className="font-bold text-gray-900 mb-3"
+            style={{ fontSize: '15px' }}
+          >
+            Recién publicados
           </p>
-        </div>
-        <ShopsGrid shops={shops} />
-      </section>
+          <ProductCarousel products={products} />
+        </section>
+
+        {/* Tiendas */}
+        <section className="mt-8 mb-4">
+          <p
+            className="font-bold text-gray-900 mb-3"
+            style={{ fontSize: '15px' }}
+          >
+            Tiendas en ModaGuajira
+          </p>
+          <ShopsGrid shops={shops} />
+        </section>
+      </div>
     </main>
   )
 }

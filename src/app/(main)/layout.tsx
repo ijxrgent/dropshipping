@@ -1,4 +1,5 @@
 import Header from '@/components/header/Header'
+import MobileFooterNav from '@/components/MobileFooterNav'
 
 export default function MainLayout({
   children,
@@ -9,6 +10,7 @@ export default function MainLayout({
     <>
       <Header />
       {children}
+      <MobileFooterNav />
     </>
   )
 }
