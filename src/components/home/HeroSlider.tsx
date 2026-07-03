@@ -36,34 +36,26 @@ export default function HeroSlider() {
   }, [next])
 
   return (
-    // Sin margen lateral — ocupa todo el ancho del contenedor padre
     <div
       className="relative w-full overflow-hidden"
-      style={{ height: '200px' }}
+      style={{ height: '250px' }}
     >
       {SLIDES.map((slide, i) => (
         <div
           key={i}
           className={`absolute inset-0 bg-gradient-to-br ${slide.gradient} transition-opacity duration-700 ${i === index ? 'opacity-100' : 'opacity-0'}`}
         >
-          {/* Texto: margen izquierdo de 52px para no chocar con la flecha (36px botón + espacio) */}
-          <div
-            className="absolute inset-0 flex flex-col justify-center"
-            style={{
-              paddingLeft: '52px',
-              paddingRight: '52px',
-              maxWidth: '560px',
-            }}
-          >
+          {/* Texto centrado */}
+          <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-8">
             <h2
               className="text-white font-bold leading-tight"
-              style={{ fontSize: '18px' }}
+              style={{ fontSize: '24px' }}
             >
               {slide.title}
             </h2>
             <p
-              className="text-white mt-1.5"
-              style={{ fontSize: '13px', opacity: 0.9 }}
+              className="text-white mt-2"
+              style={{ fontSize: '16px', opacity: 0.9 }}
             >
               {slide.subtitle}
             </p>
