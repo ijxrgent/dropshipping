@@ -84,7 +84,7 @@ export default function UserMenu({ user }: UserMenuProps) {
           {/* Links según rol */}
           <div className="py-1">
             <Link
-              href="/perfil"
+              href="/profile"
               onClick={() => setOpen(false)}
               className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-gray-900 transition-colors"
             >
@@ -92,7 +92,7 @@ export default function UserMenu({ user }: UserMenuProps) {
             </Link>
 
             <Link
-              href="/mis-compras"
+              href="/orders"
               onClick={() => setOpen(false)}
               className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-gray-900 transition-colors"
             >

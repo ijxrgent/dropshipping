@@ -145,7 +145,7 @@ export default function MobileMenu({ session, onClose }: MobileMenuProps) {
             <ul className="space-y-0.5">
               <li>
                 <Link
-                  href="/perfil"
+                  href="/profile"
                   onClick={onClose}
                   className="flex items-center gap-3 px-2 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
                 >
@@ -154,7 +154,7 @@ export default function MobileMenu({ session, onClose }: MobileMenuProps) {
               </li>
               <li>
                 <Link
-                  href="/mis-compras"
+                  href="/orders"
                   onClick={onClose}
                   className="flex items-center gap-3 px-2 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
                 >

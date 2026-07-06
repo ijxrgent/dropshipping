@@ -44,7 +44,7 @@ export default function HeaderNav() {
         {/* Derecha: Mis compras + notificaciones */}
         <div className="flex items-center gap-1">
           <Link
-            href="/mis-compras"
+            href="/orders"
             className="px-3 py-1 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-md transition-colors"
           >
             Mis compras
