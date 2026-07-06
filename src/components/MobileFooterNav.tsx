@@ -2,14 +2,14 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Home, Store, ShoppingCart, Package } from 'lucide-react'
+import { Home, Store, ShoppingCart, User } from 'lucide-react'
 import { useCartCount } from '@/components/header/CartCountProvider'
 
 const NAV = [
   { href: '/', label: 'Inicio', icon: Home },
   { href: '/products', label: 'Productos', icon: Store },
   { href: '/cart', label: 'Carrito', icon: ShoppingCart, showBadge: true },
-  { href: '/orders', label: 'Mis pedidos', icon: Package },
+  { href: '/profile', label: 'Perfil', icon: User },
 ]
 
 export default function MobileFooterNav() {

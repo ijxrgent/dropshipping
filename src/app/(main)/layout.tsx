@@ -9,7 +9,7 @@ export default function MainLayout({
   return (
     <>
       <Header />
-      {children}
+      <div className="pb-16 sm:pb-0">{children}</div>
       <MobileFooterNav />
     </>
   )
