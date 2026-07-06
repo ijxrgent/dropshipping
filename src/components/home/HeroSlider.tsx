@@ -17,7 +17,7 @@ const SLIDES = [
   {
     title: 'Nuevas tiendas cada semana',
     subtitle:
-      'Descubre boutiques y talleres que recién se unieron a ModaGuajira',
+      'Descubre boutiques y talleres que recién se unieron a Riohacha Market',
     gradient: 'from-[#7A4419] via-[#9C5B22] to-[#C76B3F]',
   },
 ]
@@ -38,7 +38,7 @@ export default function HeroSlider() {
   return (
     <div
       className="relative w-full overflow-hidden"
-      style={{ height: '250px' }}
+      style={{ height: '270px' }}
     >
       {SLIDES.map((slide, i) => (
         <div

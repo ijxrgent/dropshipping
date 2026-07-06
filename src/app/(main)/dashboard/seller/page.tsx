@@ -34,7 +34,7 @@ export default async function SellerDashboardPage() {
         <div>
           <h1 className="text-xl font-bold text-gray-900">{store.name}</h1>
           <p className="text-sm text-gray-500">
-            modaguajira.com/tienda/{store.slug}
+            riohachamarket.com/tienda/{store.slug}
           </p>
         </div>
         <span

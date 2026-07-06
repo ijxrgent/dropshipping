@@ -35,12 +35,6 @@ export default async function HomePage() {
       <div className="max-w-7xl mx-auto px-4 pb-24 sm:pb-8">
         {/* Productos */}
         <section className="mt-6">
-          <p
-            className="font-bold text-gray-900 mb-3"
-            style={{ fontSize: '15px' }}
-          >
-            Recién publicados
-          </p>
           <ProductCarousel products={products} />
         </section>
 
@@ -50,7 +44,7 @@ export default async function HomePage() {
             className="font-bold text-gray-900 mb-3"
             style={{ fontSize: '15px' }}
           >
-            Tiendas en ModaGuajira
+            Tiendas en Riohacha Market
           </p>
           <ShopsGrid shops={shops} />
         </section>

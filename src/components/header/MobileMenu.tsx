@@ -7,7 +7,7 @@ import Link from 'next/link'
 import LogoRM from '@/assets/logo_rm.webp'
 
 import { X, Bell, Package, Store, Settings, LogOut, User } from 'lucide-react'
-// import { signOut } from 'next-auth/react'
+import { signOut } from 'next-auth/react'
 
 interface Session {
   user: { name: string; email: string; role: string } | null
@@ -202,8 +202,7 @@ export default function MobileMenu({ session, onClose }: MobileMenuProps) {
             <button
               onClick={() => {
                 onClose()
-                // signOut({ callbackUrl: '/' })
-                alert('signOut() — conectar con NextAuth')
+                signOut({ callbackUrl: '/' })
               }}
               className="w-full flex items-center justify-center gap-2 py-2.5 text-sm font-medium text-red-600 hover:bg-red-50 rounded-lg transition-colors"
             >

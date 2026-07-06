@@ -29,59 +29,61 @@ export default function ProductCarousel({
 
   return (
     <div>
-      {/* Scroll horizontal:
+      {/* Scroll horizontal centrado:
           En móvil cada card ocupa calc(50% - 6px) → 2 cards visibles exactas
           En sm+ cada card tiene ancho fijo de 180px → se ven más cards */}
-      <div
-        className="flex gap-3 overflow-x-auto pb-2"
-        style={{ scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch' }}
-      >
-        {products.map((product) => {
-          const cover = product.images[0]?.url
-          return (
-            <Link
-              key={product.id}
-              href={`/shop/${product.store.slug}/${product.slug}`}
-              className="bg-white rounded-xl border border-gray-200 overflow-hidden flex-none hover:shadow-md transition-shadow"
-              // En móvil: 2 cards visibles (50% - mitad del gap)
-              // En desktop: ancho fijo de 180px
-              style={{
-                width: 'calc(50vw - 24px)',
-                maxWidth: '180px',
-                minWidth: '140px',
-              }}
-            >
-              <div className="bg-gray-100" style={{ aspectRatio: '1/1' }}>
-                {cover ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src={withCloudinaryTransform(
-                      cover,
-                      'c_fill,g_auto,w_320,h_320,f_auto,q_auto'
-                    )}
-                    alt={product.name}
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center">
-                    <Package size={20} className="text-gray-300" />
-                  </div>
-                )}
-              </div>
-              <div className="p-2.5">
-                <p className="text-xs font-medium text-gray-900 truncate">
-                  {product.name}
-                </p>
-                <p className="text-xs font-bold text-gray-900 mt-0.5">
-                  ${product.price.toLocaleString('es-CO')}
-                </p>
-                <p className="text-xs text-gray-400 truncate mt-0.5">
-                  {product.store.name}
-                </p>
-              </div>
-            </Link>
-          )
-        })}
+      <div className="flex justify-center">
+        <div
+          className="flex gap-3 overflow-x-auto pb-2"
+          style={{ scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch' }}
+        >
+          {products.map((product) => {
+            const cover = product.images[0]?.url
+            return (
+              <Link
+                key={product.id}
+                href={`/shop/${product.store.slug}/${product.slug}`}
+                className="bg-white rounded-xl border border-gray-200 overflow-hidden flex-none hover:shadow-md transition-shadow"
+                // En móvil: 2 cards visibles (50% - mitad del gap)
+                // En desktop: ancho fijo de 180px
+                style={{
+                  width: 'calc(50vw - 24px)',
+                  maxWidth: '180px',
+                  minWidth: '140px',
+                }}
+              >
+                <div className="bg-gray-100" style={{ aspectRatio: '1/1' }}>
+                  {cover ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={withCloudinaryTransform(
+                        cover,
+                        'c_fill,g_auto,w_320,h_320,f_auto,q_auto'
+                      )}
+                      alt={product.name}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center">
+                      <Package size={20} className="text-gray-300" />
+                    </div>
+                  )}
+                </div>
+                <div className="p-2.5">
+                  <p className="text-xs font-medium text-gray-900 truncate">
+                    {product.name}
+                  </p>
+                  <p className="text-xs font-bold text-gray-900 mt-0.5">
+                    ${product.price.toLocaleString('es-CO')}
+                  </p>
+                  <p className="text-xs text-gray-400 truncate mt-0.5">
+                    {product.store.name}
+                  </p>
+                </div>
+              </Link>
+            )
+          })}
+        </div>
       </div>
 
       {/* Botón Ver más */}

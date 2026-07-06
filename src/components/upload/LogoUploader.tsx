@@ -72,7 +72,7 @@ export default function LogoUploader({
       'upload_preset',
       process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET!
     )
-    formData.append('folder', 'modaguajira/logos')
+    formData.append('folder', 'riohachamarket/logos')
 
     const res = await fetch(
       `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`,

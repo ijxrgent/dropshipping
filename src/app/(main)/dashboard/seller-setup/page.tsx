@@ -84,7 +84,9 @@ export default function SellerSetupPage() {
             </div>
             <h1 className="text-lg font-bold text-gray-900">Crea tu tienda</h1>
             <p className="text-sm text-gray-500 mt-1">
-              Este es el último paso antes de empezar a vender en ModaGuajira
+              Este es el último paso antes de empezar a vender en Riohacha
+              Market. Completa los datos de tu tienda y podrás empezar a
+              publicar tus productos.
             </p>
           </div>
 
@@ -135,7 +137,7 @@ export default function SellerSetupPage() {
                 <p className="mt-1.5 text-xs text-gray-400">
                   Tu tienda se verá en:{' '}
                   <span className="font-mono">
-                    modaguajira.com/tienda/{slugPreview}
+                    riohachamarket.com/tienda/{slugPreview}
                   </span>
                 </p>
               ) : null}
