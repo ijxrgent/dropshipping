@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef, useCallback } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { Package, Loader2 } from 'lucide-react'
 import { withCloudinaryTransform } from '@/lib/cloudinaryUrl'
@@ -20,53 +20,54 @@ export default function ProductsPage() {
   const [loading, setLoading] = useState(false)
   const [initialLoading, setInitialLoading] = useState(true)
   const loaderRef = useRef<HTMLDivElement>(null)
+  const loadingRef = useRef(false)
 
-  const loadMore = useCallback(
-    async (cursor?: string) => {
-      if (loading) return
-      setLoading(true)
-      const url = cursor ? `/api/products?cursor=${cursor}` : '/api/products'
-      const res = await fetch(url)
-      const data = await res.json()
-      setProducts((prev) => (cursor ? [...prev, ...data.items] : data.items))
-      setNextCursor(data.nextCursor)
-      setLoading(false)
-      setInitialLoading(false)
-    },
-    [loading]
-  )
+  async function loadMore(cursor?: string) {
+    if (loadingRef.current) return
+    loadingRef.current = true
+    setLoading(true)
+
+    const url = cursor ? `/api/products?cursor=${cursor}` : '/api/products'
+    const res = await fetch(url)
+    const data = await res.json()
+
+    setProducts((prev) => (cursor ? [...prev, ...data.items] : data.items))
+    setNextCursor(data.nextCursor)
+    setLoading(false)
+    setInitialLoading(false)
+    loadingRef.current = false
+  }
 
   // Carga inicial
   useEffect(() => {
-    let isMounted = true
-
-    const loadInitial = async () => {
-      if (isMounted && products.length === 0 && !initialLoading) {
-        await loadMore()
-      }
-    }
-
-    loadInitial()
-
-    return () => {
-      isMounted = false
-    }
-  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+    loadMore()
+  }, [])
 
   // Observer para scroll infinito
   useEffect(() => {
-    if (!loaderRef.current) return
+    loadMore()
+  }, [])
+
+  // Observer para scroll infinito
+  useEffect(() => {
+    const el = loaderRef.current
+    if (!el) return
+
     const observer = new IntersectionObserver(
       (entries) => {
-        if (entries[0].isIntersecting && nextCursor && !loading) {
-          loadMore(nextCursor)
+        if (entries[0].isIntersecting && !loadingRef.current) {
+          setNextCursor((cursor) => {
+            if (cursor) loadMore(cursor)
+            return cursor
+          })
         }
       },
       { threshold: 0.1 }
     )
-    observer.observe(loaderRef.current)
+
+    observer.observe(el)
     return () => observer.disconnect()
-  }, [nextCursor, loading, loadMore])
+  }, [])
 
   return (
     <main className="max-w-7xl mx-auto px-4 pb-24 sm:pb-8 pt-6">
