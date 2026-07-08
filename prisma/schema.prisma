@@ -133,6 +133,8 @@ model Product {
   slug        String   @unique
   description String?
   price       Int
+  originalPrice Int?      // ← precio antes del descuento (null = sin oferta)
+  discount      Int?      // ← porcentaje de descuento 1-99 (null = sin oferta)
   stock       Int      @default(0)
   isPublished Boolean  @default(false)
   createdAt   DateTime @default(now())
