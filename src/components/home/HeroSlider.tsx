@@ -6,7 +6,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react'
 const SLIDES = [
   {
     title: 'Moda con raíces',
-    subtitle: 'Artesanías wayuu y diseño local, directo desde La Guajira',
+    subtitle: 'Artesanías y diseño local, directo desde La Guajira',
     gradient: 'from-[#C76B3F] via-[#D98A4F] to-[#E8B05F]',
   },
   {

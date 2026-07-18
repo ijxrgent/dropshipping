@@ -121,7 +121,7 @@ export default function SellerSetupPage() {
               <input
                 id="name"
                 type="text"
-                placeholder="Ej: Mochilas Wayuu María"
+                placeholder="Ej: Mochilas María"
                 {...register('name')}
                 className={`w-full h-11 px-4 rounded-lg border text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition ${
                   errors.name

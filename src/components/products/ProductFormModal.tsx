@@ -1,10 +1,10 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { X, Loader2, ImagePlus, Trash2 } from 'lucide-react'
+import { X, Loader2, ImagePlus, Trash2, Tag } from 'lucide-react'
 import type {
   Product,
   Category,
@@ -13,20 +13,21 @@ import type {
 const ProductSchema = z.object({
   name: z.string().min(3, 'Mínimo 3 caracteres').max(80),
   description: z.string().max(500).optional(),
-  price: z.coerce.number().int().min(1000, 'El precio mínimo es $1.000 COP'),
+  originalPrice: z.coerce
+    .number()
+    .int()
+    .min(1000, 'El precio mínimo es $1.000 COP'),
+  discount: z.coerce.number().int().min(0).max(99).optional(),
   stock: z.coerce.number().int().min(0, 'El stock no puede ser negativo'),
   categoryId: z.string().min(1, 'Selecciona una categoría'),
+  hasDiscount: z.boolean(),
 })
 
-// Tipo de ENTRADA: lo que el formulario maneja mientras el usuario escribe
-// (price/stock llegan como string desde el <input>, antes de que Zod los convierta)
 type ProductFormInput = z.input<typeof ProductSchema>
-
-// Tipo de SALIDA: lo que resulta después de validar (price/stock ya son number)
 type ProductForm = z.output<typeof ProductSchema>
 
 interface ImageItem {
-  id: string // id temporal o real
+  id: string
   url: string
   isNew: boolean
 }
@@ -65,23 +66,45 @@ export default function ProductFormModal({
   )
   const [uploadingImages, setUploadingImages] = useState(false)
   const [serverError, setServerError] = useState<string | null>(null)
+  const [finalPrice, setFinalPrice] = useState<number | null>(null)
 
   const {
     register,
     handleSubmit,
+    watch,
+    setValue,
     formState: { errors, isSubmitting },
-  } = useForm<ProductFormInput, unknown, ProductForm>({
+  } = useForm<ProductFormInput>({
     resolver: zodResolver(ProductSchema),
     defaultValues: product
       ? {
           name: product.name,
           description: product.description ?? '',
-          price: product.price,
+          originalPrice: product.originalPrice ?? product.price,
+          discount: product.discount ?? 0,
           stock: product.stock,
           categoryId: product.categoryId,
+          hasDiscount: !!product.discount,
         }
-      : { price: 0, stock: 0 },
+      : { stock: 0, discount: 0, hasDiscount: false },
   })
+
+  const hasDiscount = watch('hasDiscount')
+  const originalPrice = watch('originalPrice')
+  const discount = Number(watch('discount') ?? 0)
+
+  // Calcula el precio final en tiempo real
+  useEffect(() => {
+    const price = Number(originalPrice)
+    const disc = Number(discount)
+    if (price > 0 && hasDiscount && disc > 0 && disc < 100) {
+      setFinalPrice(Math.round(price * (1 - disc / 100)))
+    } else if (price > 0) {
+      setFinalPrice(price)
+    } else {
+      setFinalPrice(null)
+    }
+  }, [originalPrice, discount, hasDiscount])
 
   async function handleFilesSelected(e: React.ChangeEvent<HTMLInputElement>) {
     const files = Array.from(e.target.files ?? [])
@@ -121,7 +144,7 @@ export default function ProductFormModal({
       'upload_preset',
       process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET!
     )
-    formData.append('folder', 'riohachamarket/products')
+    formData.append('folder', 'modaguajira/products')
 
     const res = await fetch(
       `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`,
@@ -137,13 +160,25 @@ export default function ProductFormModal({
     setImages((prev) => prev.filter((img) => img.id !== id))
   }
 
-  async function onSubmit(data: ProductForm) {
+  // 🔥 FUNCIÓN CORREGIDA - Usando ProductFormInput y convirtiendo valores
+  async function onSubmit(data: ProductFormInput) {
     setServerError(null)
 
     if (images.length === 0) {
       setServerError('Agrega al menos una imagen del producto')
       return
     }
+
+    // Convertir valores a número de forma segura
+    const originalPrice = Number(data.originalPrice)
+    const discount = Number(data.discount ?? 0)
+    const stock = Number(data.stock)
+
+    // Calcula el precio final
+    const price =
+      data.hasDiscount && data.discount
+        ? Math.round(originalPrice * (1 - discount / 100))
+        : originalPrice
 
     const url = isEditing
       ? `/api/seller/products/${product!.id}`
@@ -154,8 +189,14 @@ export default function ProductFormModal({
       method,
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        ...data,
+        name: data.name,
         slug: slugify(data.name),
+        description: data.description,
+        price,
+        originalPrice: data.hasDiscount ? originalPrice : null,
+        discount: data.hasDiscount && data.discount ? discount : null,
+        stock,
+        categoryId: data.categoryId,
         images: images.map((img, index) => ({ url: img.url, order: index })),
       }),
     })
@@ -200,8 +241,7 @@ export default function ProductFormModal({
           {/* Imágenes */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Fotos del producto{' '}
-              <span className="text-gray-400 font-normal">(hasta 6)</span>
+              Fotos <span className="text-gray-400 font-normal">(hasta 6)</span>
             </label>
             <div className="grid grid-cols-4 gap-2">
               {images.map((img) => (
@@ -224,7 +264,6 @@ export default function ProductFormModal({
                   </button>
                 </div>
               ))}
-
               {images.length < 6 && (
                 <button
                   type="button"
@@ -257,11 +296,9 @@ export default function ProductFormModal({
             </label>
             <input
               type="text"
-              placeholder="Ej: Mochila wayuu tejida a mano"
+              placeholder="Ej: Mochila tejida a mano"
               {...register('name')}
-              className={`w-full h-10 px-3 rounded-lg border text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition ${
-                errors.name ? 'border-red-400 bg-red-50' : 'border-gray-300'
-              }`}
+              className={`w-full h-10 px-3 rounded-lg border text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition ${errors.name ? 'border-red-400 bg-red-50' : 'border-gray-300'}`}
             />
             {errors.name && (
               <p className="mt-1 text-xs text-red-600">{errors.name.message}</p>
@@ -275,11 +312,7 @@ export default function ProductFormModal({
             </label>
             <select
               {...register('categoryId')}
-              className={`w-full h-10 px-3 rounded-lg border text-sm bg-white focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition ${
-                errors.categoryId
-                  ? 'border-red-400 bg-red-50'
-                  : 'border-gray-300'
-              }`}
+              className={`w-full h-10 px-3 rounded-lg border text-sm bg-white focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition ${errors.categoryId ? 'border-red-400 bg-red-50' : 'border-gray-300'}`}
             >
               <option value="">Selecciona una categoría</option>
               {categories.map((cat) => (
@@ -299,19 +332,17 @@ export default function ProductFormModal({
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                Precio (COP)
+                {hasDiscount ? 'Precio original (COP)' : 'Precio (COP)'}
               </label>
               <input
                 type="number"
                 placeholder="50000"
-                {...register('price')}
-                className={`w-full h-10 px-3 rounded-lg border text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition ${
-                  errors.price ? 'border-red-400 bg-red-50' : 'border-gray-300'
-                }`}
+                {...register('originalPrice')}
+                className={`w-full h-10 px-3 rounded-lg border text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition ${errors.originalPrice ? 'border-red-400 bg-red-50' : 'border-gray-300'}`}
               />
-              {errors.price && (
+              {errors.originalPrice && (
                 <p className="mt-1 text-xs text-red-600">
-                  {errors.price.message}
+                  {errors.originalPrice.message}
                 </p>
               )}
             </div>
@@ -323,9 +354,7 @@ export default function ProductFormModal({
                 type="number"
                 placeholder="10"
                 {...register('stock')}
-                className={`w-full h-10 px-3 rounded-lg border text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition ${
-                  errors.stock ? 'border-red-400 bg-red-50' : 'border-gray-300'
-                }`}
+                className={`w-full h-10 px-3 rounded-lg border text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition ${errors.stock ? 'border-red-400 bg-red-50' : 'border-gray-300'}`}
               />
               {errors.stock && (
                 <p className="mt-1 text-xs text-red-600">
@@ -333,6 +362,70 @@ export default function ProductFormModal({
                 </p>
               )}
             </div>
+          </div>
+
+          {/* Toggle descuento */}
+          <div className="bg-gray-50 rounded-xl p-4">
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2">
+                <Tag size={15} className="text-gray-500" />
+                <span className="text-sm font-medium text-gray-700">
+                  ¿Producto en oferta?
+                </span>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  setValue('hasDiscount', !hasDiscount)
+                  if (hasDiscount) setValue('discount', 0)
+                }}
+                className={`relative w-10 h-5 rounded-full transition-colors ${hasDiscount ? 'bg-teal-600' : 'bg-gray-300'}`}
+              >
+                <span
+                  className={`absolute top-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform ${hasDiscount ? 'translate-x-5' : 'translate-x-0.5'}`}
+                />
+              </button>
+            </div>
+
+            {hasDiscount && (
+              <div className="space-y-3">
+                <div>
+                  <label className="block text-xs text-gray-500 mb-1">
+                    Porcentaje de descuento (%)
+                  </label>
+                  <input
+                    type="number"
+                    min={1}
+                    max={99}
+                    placeholder="20"
+                    {...register('discount')}
+                    className="w-full h-9 px-3 rounded-lg border border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition"
+                  />
+                </div>
+
+                {/* Preview del precio final */}
+                {finalPrice !== null &&
+                  Number(originalPrice) > 0 &&
+                  Number(discount) > 0 && (
+                    <div className="bg-white rounded-lg p-3 border border-teal-200">
+                      <p className="text-xs text-gray-500 mb-1">
+                        El comprador verá:
+                      </p>
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-bold text-red-600">
+                          ${finalPrice.toLocaleString('es-CO')}
+                        </span>
+                        <span className="text-xs text-gray-400 line-through">
+                          ${Number(originalPrice).toLocaleString('es-CO')}
+                        </span>
+                        <span className="text-xs font-bold text-white bg-red-600 px-1.5 py-0.5 rounded">
+                          -{discount}%
+                        </span>
+                      </div>
+                    </div>
+                  )}
+              </div>
+            )}
           </div>
 
           {/* Descripción */}

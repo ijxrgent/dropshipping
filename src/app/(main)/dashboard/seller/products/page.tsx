@@ -26,6 +26,8 @@ export interface Product {
   slug: string
   description: string | null
   price: number
+  originalPrice: number | null
+  discount: number | null
   stock: number
   isPublished: boolean
   categoryId: string

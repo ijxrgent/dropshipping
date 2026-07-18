@@ -124,7 +124,7 @@ export default function CategoriasPage() {
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="Ej: Artesanías wayuu"
+                placeholder="Ej: Artesanías"
                 autoFocus
                 className={`w-full h-10 px-4 rounded-lg border text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition ${
                   error ? 'border-red-400 bg-red-50' : 'border-gray-300'

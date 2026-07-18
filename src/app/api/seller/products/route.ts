@@ -3,7 +3,6 @@ import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/auth'
 import { prisma } from '@/lib/prisma'
 
-// GET — listar productos de la tienda del vendedor actual
 export async function GET(req: NextRequest) {
   const session = await auth()
   if (!session?.user || session.user.role !== 'SELLER') {
@@ -13,12 +12,11 @@ export async function GET(req: NextRequest) {
   const store = await prisma.store.findUnique({
     where: { userId: session.user.id },
   })
-  if (!store) {
+  if (!store)
     return NextResponse.json(
       { error: 'No tienes una tienda creada' },
       { status: 404 }
     )
-  }
 
   const { searchParams } = new URL(req.url)
   const search = searchParams.get('search') ?? ''
@@ -38,7 +36,6 @@ export async function GET(req: NextRequest) {
   return NextResponse.json(products)
 }
 
-// POST — crear producto nuevo
 export async function POST(req: NextRequest) {
   const session = await auth()
   if (!session?.user || session.user.role !== 'SELLER') {
@@ -48,15 +45,23 @@ export async function POST(req: NextRequest) {
   const store = await prisma.store.findUnique({
     where: { userId: session.user.id },
   })
-  if (!store) {
+  if (!store)
     return NextResponse.json(
       { error: 'No tienes una tienda creada' },
       { status: 404 }
     )
-  }
 
-  const { name, slug, description, price, stock, categoryId, images } =
-    await req.json()
+  const {
+    name,
+    slug,
+    description,
+    price,
+    originalPrice,
+    discount,
+    stock,
+    categoryId,
+    images,
+  } = await req.json()
 
   if (!name || !categoryId || price == null) {
     return NextResponse.json(
@@ -65,7 +70,6 @@ export async function POST(req: NextRequest) {
     )
   }
 
-  // Verificar slug único, agregar sufijo si ya existe
   let finalSlug = slug
   let counter = 1
   while (await prisma.product.findUnique({ where: { slug: finalSlug } })) {
@@ -81,8 +85,10 @@ export async function POST(req: NextRequest) {
       slug: finalSlug,
       description,
       price,
+      originalPrice: originalPrice ?? null,
+      discount: discount ?? null,
       stock: stock ?? 0,
-      isPublished: false, // se publica manualmente desde el listado
+      isPublished: false,
       images: {
         create: (images ?? []).map((img: { url: string; order: number }) => ({
           url: img.url,

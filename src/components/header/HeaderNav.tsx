@@ -1,37 +1,36 @@
-//src/components/header/HeaderNav.tsx
 'use client'
 
 import Link from 'next/link'
 import { Bell } from 'lucide-react'
 
-const CATEGORIES = [
-  { label: 'Mujer', href: '/categoria/mujer' },
-  { label: 'Hombre', href: '/categoria/hombre' },
-  { label: 'Artesanías', href: '/categoria/artesanias' },
-  { label: 'Accesorios', href: '/categoria/accesorios' },
-  { label: 'Calzado', href: '/categoria/calzado' },
-]
+interface Category {
+  name: string
+  slug: string
+}
 
-export default function HeaderNav() {
+interface HeaderNavProps {
+  categories: Category[]
+}
+
+export default function HeaderNav({ categories }: HeaderNavProps) {
   return (
     <nav
       aria-label="Navegación secundaria"
       className="hidden md:block border-t border-gray-200"
     >
-      <div className="max-w-7xl mx-auto px-4 h-10 flex items-center justify-center md:justify-between">
-        {/* Izquierda: categorías + ofertas */}
-        <ul className="hidden md:flex items-center gap-1">
-          {CATEGORIES.map((cat) => (
-            <li key={cat.href}>
+      <div className="max-w-7xl mx-auto px-4 h-10 flex items-center justify-between">
+        <ul className="flex items-center gap-1 overflow-x-auto">
+          {categories.map((cat) => (
+            <li key={cat.slug} className="flex-shrink-0">
               <Link
-                href={cat.href}
-                className="px-3 py-1 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-md transition-colors"
+                href={`/categoria/${cat.slug}`}
+                className="px-3 py-1 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-md transition-colors whitespace-nowrap"
               >
-                {cat.label}
+                {cat.name}
               </Link>
             </li>
           ))}
-          <li>
+          <li className="flex-shrink-0">
             <Link
               href="/ofertas"
               className="px-3 py-1 text-sm font-semibold text-white bg-red-600 hover:bg-red-700 rounded-md transition-colors"
@@ -40,16 +39,13 @@ export default function HeaderNav() {
             </Link>
           </li>
         </ul>
-
-        {/* Derecha: Mis compras + notificaciones */}
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-1 flex-shrink-0">
           <Link
             href="/orders"
             className="px-3 py-1 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-md transition-colors"
           >
             Mis compras
           </Link>
-
           <Link
             href="/notificaciones"
             aria-label="Notificaciones"

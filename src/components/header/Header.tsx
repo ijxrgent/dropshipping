@@ -3,7 +3,6 @@
 import { useState } from 'react'
 import { useSession } from 'next-auth/react'
 import HeaderTop from './HeaderTop'
-import HeaderNav from './HeaderNav'
 import MobileMenu from './MobileMenu'
 
 export default function Header() {
@@ -28,7 +27,6 @@ export default function Header() {
         onMenuToggle={() => setMobileOpen((v) => !v)}
         isLoading={status === 'loading'}
       />
-      <HeaderNav />
       {mobileOpen && (
         <MobileMenu
           session={sessionData}
