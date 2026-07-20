@@ -19,7 +19,7 @@ export default function HeaderNav({ categories }: HeaderNavProps) {
       className="hidden md:block border-t border-gray-200"
     >
       <div className="max-w-7xl mx-auto px-4 h-10 flex items-center justify-between">
-        <ul className="flex items-center gap-1 overflow-x-auto">
+        <ul className="flex items-center gap-1">
           {categories.map((cat) => (
             <li key={cat.slug} className="flex-shrink-0">
               <Link

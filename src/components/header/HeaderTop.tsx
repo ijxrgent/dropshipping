@@ -5,9 +5,10 @@ import Link from 'next/link'
 
 import LogoRM from '@/assets/logo_rm.webp'
 
-import { ShoppingCart, Menu, Search } from 'lucide-react'
+import { ShoppingCart, Menu } from 'lucide-react'
 import UserMenu from './UserMenu'
 import { useCartCount } from './CartCountProvider'
+import SearchBar from './SearchBar'
 
 interface Session {
   user: { name: string; email: string; role: string } | null
@@ -43,21 +44,7 @@ export default function HeaderTop({
       </Link>
 
       {/* Buscador — ocupa el espacio disponible */}
-      <div className="flex-1 max-w-2xl">
-        <div className="relative">
-          <input
-            type="search"
-            placeholder="Buscar productos, tiendas o marcas..."
-            className="w-full h-10 pl-4 pr-10 rounded-full border border-gray-300 bg-white text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent transition"
-          />
-          <button
-            aria-label="Buscar"
-            className="absolute right-0 top-0 h-10 w-10 flex items-center justify-center bg-gray-900 hover:bg-gray-800 rounded-full transition-colors"
-          >
-            <Search size={16} className="text-white" />
-          </button>
-        </div>
-      </div>
+      <SearchBar />
 
       {/* Carrito y menú hamburguesa — solo móvil */}
       <div className="flex items-center gap-2 md:hidden">
