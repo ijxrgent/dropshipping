@@ -14,6 +14,8 @@ export default async function HomePage() {
         name: true,
         slug: true,
         price: true,
+        originalPrice: true,
+        discount: true,
         images: { take: 1, orderBy: { order: 'asc' }, select: { url: true } },
         store: { select: { name: true, slug: true } },
       },

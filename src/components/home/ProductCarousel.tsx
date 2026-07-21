@@ -8,9 +8,15 @@ export interface FeaturedProduct {
   id: string
   name: string
   slug: string
-  price: number
+  price: number // precio final
+  originalPrice: number | null
+  discount: number | null
+
   images: { url: string }[]
-  store: { name: string; slug: string }
+  store: {
+    name: string
+    slug: string
+  }
 }
 
 export default function ProductCarousel({
@@ -38,6 +44,7 @@ export default function ProductCarousel({
           style={{ scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch' }}
         >
           {products.map((product) => {
+            console.log(product)
             const cover = product.images[0]?.url
             return (
               <Link
@@ -70,13 +77,37 @@ export default function ProductCarousel({
                   )}
                 </div>
                 <div className="p-2.5">
+                  {/* Nombre */}
                   <p className="text-xs font-medium text-gray-900 truncate">
                     {product.name}
                   </p>
-                  <p className="text-xs font-bold text-gray-900 mt-0.5">
-                    ${product.price.toLocaleString('es-CO')}
-                  </p>
-                  <p className="text-xs text-gray-400 truncate mt-0.5">
+
+                  {product.discount && product.originalPrice ? (
+                    <>
+                      {/* Precio original + descuento */}
+                      <div className="flex items-center gap-1 mt-1">
+                        <span className="text-[11px] text-gray-400 line-through">
+                          ${product.originalPrice.toLocaleString('es-CO')}
+                        </span>
+
+                        <span className="bg-red-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded">
+                          -{product.discount}%
+                        </span>
+                      </div>
+
+                      {/* Precio final */}
+                      <p className="text-sm font-bold text-gray-900 mt-1">
+                        ${product.price.toLocaleString('es-CO')}
+                      </p>
+                    </>
+                  ) : (
+                    <p className="text-sm font-bold text-gray-900 mt-1">
+                      ${product.price.toLocaleString('es-CO')}
+                    </p>
+                  )}
+
+                  {/* Tienda */}
+                  <p className="text-xs text-gray-400 truncate mt-1">
                     {product.store.name}
                   </p>
                 </div>
