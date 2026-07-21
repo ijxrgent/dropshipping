@@ -1,43 +1,16 @@
 'use client'
 
-import { useState, useRef, useEffect } from 'react'
-import { useForm } from 'react-hook-form'
+import { FormProvider, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { z } from 'zod'
-import { X, Loader2, ImagePlus, Trash2, Tag } from 'lucide-react'
-import type {
-  Product,
-  Category,
-} from '@/app/(main)/dashboard/seller/products/page'
+import { X, Loader2 } from 'lucide-react'
 
-const ProductSchema = z.object({
-  name: z.string().min(3, 'Mínimo 3 caracteres').max(80),
-  description: z.string().max(500).optional(),
-  originalPrice: z.coerce
-    .number()
-    .int()
-    .min(1000, 'El precio mínimo es $1.000 COP'),
-  discount: z.coerce.number().int().min(0).max(99).optional(),
-  stock: z.coerce.number().int().min(0, 'El stock no puede ser negativo'),
-  categoryId: z.string().min(1, 'Selecciona una categoría'),
-  hasDiscount: z.boolean(),
-})
-
-type ProductFormInput = z.input<typeof ProductSchema>
-type ProductForm = z.output<typeof ProductSchema>
-
-interface ImageItem {
-  id: string
-  url: string
-  isNew: boolean
-}
-
-interface ProductFormModalProps {
-  product: Product | null
-  categories: Category[]
-  onClose: () => void
-  onSaved: () => void
-}
+import { ProductSchema } from './schemas'
+import { ProductFormInput, ProductFormModalProps } from './types'
+import { useImageUpload } from './useImageUpload'
+import { ImageUploader } from './ImageUploader'
+import { BasicInfo } from './BasicInfo'
+import { PriceSection } from './PriceSection'
+import { DescriptionField } from './DescriptionField'
 
 function slugify(text: string) {
   return text
@@ -54,27 +27,9 @@ export default function ProductFormModal({
   onClose,
   onSaved,
 }: ProductFormModalProps) {
-  const fileInputRef = useRef<HTMLInputElement>(null)
   const isEditing = !!product
 
-  const [images, setImages] = useState<ImageItem[]>(
-    product?.images.map((img) => ({
-      id: img.id,
-      url: img.url,
-      isNew: false,
-    })) ?? []
-  )
-  const [uploadingImages, setUploadingImages] = useState(false)
-  const [serverError, setServerError] = useState<string | null>(null)
-  const [finalPrice, setFinalPrice] = useState<number | null>(null)
-
-  const {
-    register,
-    handleSubmit,
-    watch,
-    setValue,
-    formState: { errors, isSubmitting },
-  } = useForm<ProductFormInput>({
+  const methods = useForm<ProductFormInput>({
     resolver: zodResolver(ProductSchema),
     defaultValues: product
       ? {
@@ -89,92 +44,37 @@ export default function ProductFormModal({
       : { stock: 0, discount: 0, hasDiscount: false },
   })
 
-  const hasDiscount = watch('hasDiscount')
-  const originalPrice = watch('originalPrice')
-  const discount = Number(watch('discount') ?? 0)
+  const {
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = methods
 
-  // Calcula el precio final en tiempo real
-  useEffect(() => {
-    const price = Number(originalPrice)
-    const disc = Number(discount)
-    if (price > 0 && hasDiscount && disc > 0 && disc < 100) {
-      setFinalPrice(Math.round(price * (1 - disc / 100)))
-    } else if (price > 0) {
-      setFinalPrice(price)
-    } else {
-      setFinalPrice(null)
-    }
-  }, [originalPrice, discount, hasDiscount])
+  const {
+    images,
+    uploadingImages,
+    error: imageError,
+    setError: setImageError,
+    handleFilesSelected,
+    removeImage,
+  } = useImageUpload(
+    product?.images.map((img) => ({
+      id: img.id,
+      url: img.url,
+      isNew: false,
+    })) ?? []
+  )
 
-  async function handleFilesSelected(e: React.ChangeEvent<HTMLInputElement>) {
-    const files = Array.from(e.target.files ?? [])
-    if (files.length === 0) return
-
-    if (images.length + files.length > 6) {
-      setServerError('Máximo 6 imágenes por producto')
-      e.target.value = ''
-      return
-    }
-
-    setUploadingImages(true)
-    setServerError(null)
-
-    try {
-      const uploaded = await Promise.all(files.map(uploadToCloudinary))
-      setImages((prev) => [
-        ...prev,
-        ...uploaded.map((url) => ({
-          id: crypto.randomUUID(),
-          url,
-          isNew: true,
-        })),
-      ])
-    } catch {
-      setServerError('Error al subir una o más imágenes')
-    } finally {
-      setUploadingImages(false)
-      e.target.value = ''
-    }
-  }
-
-  async function uploadToCloudinary(file: File): Promise<string> {
-    const formData = new FormData()
-    formData.append('file', file)
-    formData.append(
-      'upload_preset',
-      process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET!
-    )
-    formData.append('folder', 'modaguajira/products')
-
-    const res = await fetch(
-      `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`,
-      { method: 'POST', body: formData }
-    )
-
-    if (!res.ok) throw new Error('Error al subir a Cloudinary')
-    const data = await res.json()
-    return data.secure_url as string
-  }
-
-  function removeImage(id: string) {
-    setImages((prev) => prev.filter((img) => img.id !== id))
-  }
-
-  // 🔥 FUNCIÓN CORREGIDA - Usando ProductFormInput y convirtiendo valores
-  async function onSubmit(data: ProductFormInput) {
-    setServerError(null)
+  const onSubmit = async (data: ProductFormInput) => {
+    setImageError(null)
 
     if (images.length === 0) {
-      setServerError('Agrega al menos una imagen del producto')
+      setImageError('Agrega al menos una imagen del producto')
       return
     }
 
-    // Convertir valores a número de forma segura
     const originalPrice = Number(data.originalPrice)
     const discount = Number(data.discount ?? 0)
-    const stock = Number(data.stock)
 
-    // Calcula el precio final
     const price =
       data.hasDiscount && data.discount
         ? Math.round(originalPrice * (1 - discount / 100))
@@ -195,7 +95,7 @@ export default function ProductFormModal({
         price,
         originalPrice: data.hasDiscount ? originalPrice : null,
         discount: data.hasDiscount && data.discount ? discount : null,
-        stock,
+        stock: Number(data.stock),
         categoryId: data.categoryId,
         images: images.map((img, index) => ({ url: img.url, order: index })),
       }),
@@ -204,7 +104,7 @@ export default function ProductFormModal({
     const json = await res.json()
 
     if (!res.ok) {
-      setServerError(json.error ?? 'Error al guardar el producto')
+      setImageError(json.error ?? 'Error al guardar el producto')
       return
     }
 
@@ -227,240 +127,55 @@ export default function ProductFormModal({
           </button>
         </div>
 
-        <form
-          onSubmit={handleSubmit(onSubmit)}
-          noValidate
-          className="p-6 space-y-5"
-        >
-          {serverError && (
-            <div className="bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg px-4 py-3">
-              {serverError}
-            </div>
-          )}
-
-          {/* Imágenes */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Fotos <span className="text-gray-400 font-normal">(hasta 6)</span>
-            </label>
-            <div className="grid grid-cols-4 gap-2">
-              {images.map((img) => (
-                <div
-                  key={img.id}
-                  className="relative aspect-square rounded-lg overflow-hidden bg-gray-100 group"
-                >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={img.url}
-                    alt=""
-                    className="w-full h-full object-cover"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => removeImage(img.id)}
-                    className="absolute top-1 right-1 w-5 h-5 bg-black/60 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
-                  >
-                    <Trash2 size={11} className="text-white" />
-                  </button>
-                </div>
-              ))}
-              {images.length < 6 && (
-                <button
-                  type="button"
-                  onClick={() => fileInputRef.current?.click()}
-                  disabled={uploadingImages}
-                  className="aspect-square rounded-lg border-2 border-dashed border-gray-300 flex items-center justify-center hover:bg-gray-50 transition-colors disabled:opacity-50"
-                >
-                  {uploadingImages ? (
-                    <Loader2 size={16} className="text-gray-400 animate-spin" />
-                  ) : (
-                    <ImagePlus size={16} className="text-gray-400" />
-                  )}
-                </button>
-              )}
-            </div>
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              multiple
-              onChange={handleFilesSelected}
-              className="hidden"
-            />
-          </div>
-
-          {/* Nombre */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">
-              Nombre
-            </label>
-            <input
-              type="text"
-              placeholder="Ej: Mochila tejida a mano"
-              {...register('name')}
-              className={`w-full h-10 px-3 rounded-lg border text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition ${errors.name ? 'border-red-400 bg-red-50' : 'border-gray-300'}`}
-            />
-            {errors.name && (
-              <p className="mt-1 text-xs text-red-600">{errors.name.message}</p>
-            )}
-          </div>
-
-          {/* Categoría */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">
-              Categoría
-            </label>
-            <select
-              {...register('categoryId')}
-              className={`w-full h-10 px-3 rounded-lg border text-sm bg-white focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition ${errors.categoryId ? 'border-red-400 bg-red-50' : 'border-gray-300'}`}
-            >
-              <option value="">Selecciona una categoría</option>
-              {categories.map((cat) => (
-                <option key={cat.id} value={cat.id}>
-                  {cat.name}
-                </option>
-              ))}
-            </select>
-            {errors.categoryId && (
-              <p className="mt-1 text-xs text-red-600">
-                {errors.categoryId.message}
-              </p>
-            )}
-          </div>
-
-          {/* Precio y stock */}
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                {hasDiscount ? 'Precio original (COP)' : 'Precio (COP)'}
-              </label>
-              <input
-                type="number"
-                placeholder="50000"
-                {...register('originalPrice')}
-                className={`w-full h-10 px-3 rounded-lg border text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition ${errors.originalPrice ? 'border-red-400 bg-red-50' : 'border-gray-300'}`}
-              />
-              {errors.originalPrice && (
-                <p className="mt-1 text-xs text-red-600">
-                  {errors.originalPrice.message}
-                </p>
-              )}
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                Stock disponible
-              </label>
-              <input
-                type="number"
-                placeholder="10"
-                {...register('stock')}
-                className={`w-full h-10 px-3 rounded-lg border text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition ${errors.stock ? 'border-red-400 bg-red-50' : 'border-gray-300'}`}
-              />
-              {errors.stock && (
-                <p className="mt-1 text-xs text-red-600">
-                  {errors.stock.message}
-                </p>
-              )}
-            </div>
-          </div>
-
-          {/* Toggle descuento */}
-          <div className="bg-gray-50 rounded-xl p-4">
-            <div className="flex items-center justify-between mb-3">
-              <div className="flex items-center gap-2">
-                <Tag size={15} className="text-gray-500" />
-                <span className="text-sm font-medium text-gray-700">
-                  ¿Producto en oferta?
-                </span>
+        <FormProvider {...methods}>
+          <form
+            onSubmit={handleSubmit(onSubmit)}
+            noValidate
+            className="p-6 space-y-5"
+          >
+            {imageError && (
+              <div className="bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg px-4 py-3">
+                {imageError}
               </div>
+            )}
+
+            <ImageUploader
+              images={images}
+              uploadingImages={uploadingImages}
+              onFilesSelected={handleFilesSelected}
+              onRemoveImage={removeImage}
+            />
+
+            <BasicInfo
+              categories={categories}
+              errors={errors}
+              register={methods.register}
+            />
+
+            <PriceSection errors={errors} />
+
+            <DescriptionField register={methods.register} />
+
+            {/* Botones */}
+            <div className="flex gap-3 pt-2">
               <button
                 type="button"
-                onClick={() => {
-                  setValue('hasDiscount', !hasDiscount)
-                  if (hasDiscount) setValue('discount', 0)
-                }}
-                className={`relative w-10 h-5 rounded-full transition-colors ${hasDiscount ? 'bg-teal-600' : 'bg-gray-300'}`}
+                onClick={onClose}
+                className="flex-1 h-10 border border-gray-300 text-gray-600 text-sm font-medium rounded-lg hover:bg-gray-50 transition-colors"
               >
-                <span
-                  className={`absolute top-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform ${hasDiscount ? 'translate-x-5' : 'translate-x-0.5'}`}
-                />
+                Cancelar
+              </button>
+              <button
+                type="submit"
+                disabled={isSubmitting || uploadingImages}
+                className="flex-1 h-10 bg-teal-600 hover:bg-teal-700 disabled:bg-teal-400 text-white text-sm font-medium rounded-lg transition-colors flex items-center justify-center gap-2"
+              >
+                {isSubmitting && <Loader2 size={14} className="animate-spin" />}
+                {isEditing ? 'Guardar cambios' : 'Crear producto'}
               </button>
             </div>
-
-            {hasDiscount && (
-              <div className="space-y-3">
-                <div>
-                  <label className="block text-xs text-gray-500 mb-1">
-                    Porcentaje de descuento (%)
-                  </label>
-                  <input
-                    type="number"
-                    min={1}
-                    max={99}
-                    placeholder="20"
-                    {...register('discount')}
-                    className="w-full h-9 px-3 rounded-lg border border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition"
-                  />
-                </div>
-
-                {/* Preview del precio final */}
-                {finalPrice !== null &&
-                  Number(originalPrice) > 0 &&
-                  Number(discount) > 0 && (
-                    <div className="bg-white rounded-lg p-3 border border-teal-200">
-                      <p className="text-xs text-gray-500 mb-1">
-                        El comprador verá:
-                      </p>
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm font-bold text-red-600">
-                          ${finalPrice.toLocaleString('es-CO')}
-                        </span>
-                        <span className="text-xs text-gray-400 line-through">
-                          ${Number(originalPrice).toLocaleString('es-CO')}
-                        </span>
-                        <span className="text-xs font-bold text-white bg-red-600 px-1.5 py-0.5 rounded">
-                          -{discount}%
-                        </span>
-                      </div>
-                    </div>
-                  )}
-              </div>
-            )}
-          </div>
-
-          {/* Descripción */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">
-              Descripción{' '}
-              <span className="text-gray-400 font-normal">(opcional)</span>
-            </label>
-            <textarea
-              rows={3}
-              placeholder="Material, tamaño, cuidados..."
-              {...register('description')}
-              className="w-full px-3 py-2 rounded-lg border border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition resize-none"
-            />
-          </div>
-
-          {/* Botones */}
-          <div className="flex gap-3 pt-2">
-            <button
-              type="button"
-              onClick={onClose}
-              className="flex-1 h-10 border border-gray-300 text-gray-600 text-sm font-medium rounded-lg hover:bg-gray-50 transition-colors"
-            >
-              Cancelar
-            </button>
-            <button
-              type="submit"
-              disabled={isSubmitting || uploadingImages}
-              className="flex-1 h-10 bg-teal-600 hover:bg-teal-700 disabled:bg-teal-400 text-white text-sm font-medium rounded-lg transition-colors flex items-center justify-center gap-2"
-            >
-              {isSubmitting && <Loader2 size={14} className="animate-spin" />}
-              {isEditing ? 'Guardar cambios' : 'Crear producto'}
-            </button>
-          </div>
-        </form>
+          </form>
+        </FormProvider>
       </div>
     </div>
   )
