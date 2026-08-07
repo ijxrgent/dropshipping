@@ -10,14 +10,23 @@ const adapter = new PrismaNeon({
 const prisma = new PrismaClient({ adapter })
 
 async function main() {
-  const hashedPassword = await bcrypt.hash('jt2604V', 12)
+  const adminEmail = process.env.SEED_ADMIN_EMAIL
+  const adminPassword = process.env.SEED_ADMIN_PASSWORD
+
+  if (!adminEmail || !adminPassword) {
+    throw new Error('SEED_ADMIN_EMAIL and SEED_ADMIN_PASSWORD are required')
+  }
+
+  const hashedPassword = await bcrypt.hash(adminPassword, 12)
 
   const admin = await prisma.user.upsert({
-    where: { email: 'jtoncelviloria@gmail.com' },
+    where: {
+      email: adminEmail,
+    },
     update: {},
     create: {
       name: 'Admin',
-      email: 'jtoncelviloria@gmail.com',
+      email: adminEmail,
       password: hashedPassword,
       role: 'ADMIN',
     },

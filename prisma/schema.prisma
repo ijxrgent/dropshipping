@@ -228,12 +228,15 @@ model Notification {
   title     String
   body      String
   isRead    Boolean   @default(false)
+  readAt    DateTime?
   link      String?
   metadata  Json?
   createdAt DateTime  @default(now())
 
   user User @relation(fields: [userId], references: [id])
 
+  @@index([userId, createdAt])
+  @@index([userId, isRead])
   @@map("notifications")
 }
 
