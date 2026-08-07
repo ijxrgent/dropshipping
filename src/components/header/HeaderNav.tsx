@@ -1,7 +1,8 @@
 'use client'
 
 import Link from 'next/link'
-import { Bell, ChevronDown } from 'lucide-react'
+import { ChevronDown } from 'lucide-react'
+import NotificationBell from '@/components/notifications/NotificationBell'
 import { useState } from 'react'
 
 interface Category {
@@ -100,13 +101,7 @@ export default function HeaderNav({ categories }: HeaderNavProps) {
           >
             Mis compras
           </Link>
-          <Link
-            href="/notificaciones"
-            aria-label="Notificaciones"
-            className="relative p-2 rounded-lg hover:bg-gray-100 transition-colors"
-          >
-            <Bell size={18} className="text-gray-600" />
-          </Link>
+          <NotificationBell />
         </div>
       </div>
     </nav>

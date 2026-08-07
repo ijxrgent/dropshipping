@@ -23,7 +23,19 @@ export async function POST(req: NextRequest) {
   // Trae el carrito con los datos de producto necesarios para validar stock y precio
   const cartItems = await prisma.cartItem.findMany({
     where: { userId: session.user.id },
-    include: { product: true },
+    include: {
+      product: {
+        include: {
+          store: {
+            select: {
+              id: true,
+              name: true,
+              userId: true,
+            },
+          },
+        },
+      },
+    },
   })
 
   if (cartItems.length === 0) {
@@ -60,13 +72,14 @@ export async function POST(req: NextRequest) {
   try {
     // Transacción: todo ocurre junto, o nada ocurre
     const order = await prisma.$transaction(async (tx) => {
+      // 1. Crear pedido
       const newOrder = await tx.order.create({
         data: {
           buyerId: session.user.id,
           total,
-          status: 'PAID', // simulado: se marca como pagada directamente
+          status: 'PAID',
           address,
-          wompiRef: `SIMULATED-${Date.now()}`, // referencia falsa hasta integrar Wompi real
+          wompiRef: `SIMULATED-${Date.now()}`,
           orderItems: {
             create: cartItems.map((item) => ({
               productId: item.productId,
@@ -78,19 +91,65 @@ export async function POST(req: NextRequest) {
             })),
           },
         },
-        include: { orderItems: true },
+        include: {
+          orderItems: true,
+        },
       })
 
-      // Descuenta el stock de cada producto
+      // 2. Crear notificaciones para los vendedores
+      const sellers = new Map<
+        string,
+        {
+          storeId: string
+          storeName: string
+        }
+      >()
+
       for (const item of cartItems) {
-        await tx.product.update({
-          where: { id: item.productId },
-          data: { stock: { decrement: item.quantity } },
+        const sellerId = item.product.store.userId
+
+        if (!sellers.has(sellerId)) {
+          sellers.set(sellerId, {
+            storeId: item.product.store.id,
+            storeName: item.product.store.name,
+          })
+        }
+      }
+
+      for (const [sellerId, store] of sellers) {
+        await tx.notification.create({
+          data: {
+            userId: sellerId,
+            type: 'NEW_SALE',
+            title: 'Nueva venta',
+            body: `Has recibido una nueva venta en ${store.storeName}.`,
+            link: `/dashboard/seller/orders`,
+            metadata: {
+              orderId: newOrder.id,
+              storeId: store.storeId,
+            },
+          },
         })
       }
 
-      // Vacía el carrito del comprador
-      await tx.cartItem.deleteMany({ where: { userId: session.user.id } })
+      // 3. Descontar stock
+      for (const item of cartItems) {
+        await tx.product.update({
+          where: { id: item.productId },
+          data: {
+            stock: {
+              decrement: item.quantity,
+            },
+          },
+        })
+      }
+
+      // 4. Vaciar carrito
+      await tx.cartItem.deleteMany({
+        where: {
+          userId: session.user.id,
+        },
+      })
 
       return newOrder
     })
